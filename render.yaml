@@ -77,29 +77,7 @@ services:
         value: "--max_old_space_size=4096"
       - key: TYPESCRIPT_SUPPORT
         value: "true"
-  - type: redis
-    name: laudspeaker
-    ipAllowList:
-      - source: 0.0.0.0/0
-        description: everywhere
-  - type: pserv
-    name: clickhouse
-    env: docker
-    dockerfilePath: ./Dockerfile.clickhouse
-    disk:
-      name: data
-      mountPath: /var/lib/clickhouse
-      sizeGB: 10
-  - type: pserv
-    name: mongo
-    env: docker
-    dockerfilePath: ./Dockerfile.mongo
-    disk:
-      name: data
-      mountPath: /data/db
-      sizeGB: 10
-databases:
-  - name: laudspeaker-db
+
   - type: web
     name: laudspeaker-api
     env: node
@@ -108,8 +86,12 @@ databases:
     startCommand: npm run start:prod
     nodeVersion: 18.x
     envVars:
+      - fromGroup: laudspeaker
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 80
+      # ...existing code for other env vars...
 
   - type: web
     name: laudspeaker-client
@@ -120,3 +102,30 @@ databases:
       - type: rewrite
         source: /*
         destination: /index.html
+
+  - type: redis
+    name: laudspeaker
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: everywhere
+
+  - type: pserv
+    name: clickhouse
+    env: docker
+    dockerfilePath: ./Dockerfile.clickhouse
+    disk:
+      name: data
+      mountPath: /var/lib/clickhouse
+      sizeGB: 10
+
+  - type: pserv
+    name: mongo
+    env: docker
+    dockerfilePath: ./Dockerfile.mongo
+    disk:
+      name: data
+      mountPath: /data/db
+      sizeGB: 10
+
+databases:
+  - name: laudspeaker-db

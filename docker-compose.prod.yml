@@ -1,0 +1,63 @@
+version: "3.7"
+services:
+  laudspeaker:
+    image: laudspeaker/laudspeaker:latest
+    restart: always
+    ports:
+      - "80:80"
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - redis
+      - postgres
+      - mongo
+      - clickhouse
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:alpine
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+  postgres:
+    image: postgres:16.3-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env.production
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: laudspeaker
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    command: mongod --replSet rs0
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    restart: always
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+volumes:
+  redis_data:
+  postgres_data:
+  mongo_data:
+  clickhouse_data:

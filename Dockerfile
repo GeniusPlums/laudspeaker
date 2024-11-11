@@ -49,7 +49,7 @@ RUN if [ ! -z "$BACKEND_SENTRY_AUTH_TOKEN" ] ; then npm run build:server:sourcem
 
 RUN ./node_modules/.bin/sentry-cli releases propose-version > /app/SENTRY_RELEASE
 
-FROM node:16 As final
+FROM node:16-alpine As final
 # Env vars
 ARG BACKEND_SENTRY_DSN_URL=https://15c7f142467b67973258e7cfaf814500@o4506038702964736.ingest.sentry.io/4506040630640640
 ENV SENTRY_DSN_URL_BACKEND=${BACKEND_SENTRY_DSN_URL}
@@ -82,5 +82,13 @@ EXPOSE 80
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 
 RUN ["chmod", "+x", "/app/docker-entrypoint.sh"]
+
+# Add production optimizations
+RUN npm ci --only=production
+RUN npm cache clean --force
+
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:80/health || exit 1
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]

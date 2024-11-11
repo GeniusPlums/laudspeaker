@@ -27,13 +27,13 @@
     "format": "concurrently 'npm run format:client' 'npm run format:server'",
     "format:client": "npm run format -w packages/client",
     "format:server": "npm run format -w packages/server",
-    "build": "npm run clean && npm run build:server && npm run build:client",
-    "build:client": "cd packages/client && npm run build",
+    "build": "NODE_OPTIONS=--max_old_space_size=4096 npm run clean && npm run build:server && npm run build:client",
+    "build:client": "NODE_OPTIONS=--max_old_space_size=4096 cd packages/client && npm run build",
     "build:client:sourcemaps": "npm run sentry:sourcemaps -w packages/client",
     "build:server": "cd packages/server && npm run build",
     "build:server:sourcemaps": "npm run sentry:sourcemaps -w packages/server",
     "clean": "rm -rf packages/*/dist packages/*/build",
-    "preinstall": "npm run clean || true",
+    "preinstall": "npm run clean && npx update-browserslist-db@latest || true",
     "start": "concurrently 'npm run start:client' 'npm run start:server'",
     "start:client": "npm run start -w packages/client",
     "start:client:ci": "npm run start:ci -w packages/client",
@@ -57,5 +57,8 @@
   "engines": {
     "node": "18.x",
     "npm": "8.x"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }

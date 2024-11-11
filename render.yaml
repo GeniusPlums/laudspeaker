@@ -2,8 +2,10 @@ services:
   - type: web
     name: laudspeaker
     env: node
-    buildCommand: npm ci && npm run build
-    startCommand: npm run start:prod
+    buildCommand: |
+      npm ci
+      npm run build
+    startCommand: node dist/main.js
     nodeVersion: 18
     healthCheckPath: /login
     dockerfilePath: ./Dockerfile.laudspeaker
@@ -82,8 +84,10 @@ services:
     name: laudspeaker-api
     env: node
     region: oregon
-    buildCommand: npm ci && npm run build:server
-    startCommand: npm run start:prod
+    buildCommand: |
+      npm ci
+      npm run build:server
+    startCommand: node dist/main.js
     nodeVersion: 18.x
     envVars:
       - fromGroup: laudspeaker
@@ -96,8 +100,10 @@ services:
   - type: web
     name: laudspeaker-client
     env: static
-    buildCommand: npm ci && npm run build:client
-    staticPublishPath: packages/client/build
+    buildCommand: |
+      npm ci
+      NODE_ENV=production npm run build:client
+    staticPublishPath: ./dist
     routes:
       - type: rewrite
         source: /*

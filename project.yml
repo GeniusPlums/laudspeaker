@@ -7,9 +7,9 @@ services:
       repo: your-repo/laudspeaker
     build_command: |
       npm ci
-      npm run build
+      NODE_OPTIONS=--max_old_space_size=4096 npm run build:server
     run_command: npm run start:prod
-    environment_slug: nodejs-18
+    environment_slug: nodejs
     envs:
       - key: NODE_ENV
         value: production
@@ -24,11 +24,12 @@ services:
         - packages/server/**
         - package.json
         - package-lock.json
+    runtime: nodejs:18
 
   - name: client
     build_command: |
       npm ci
-      npm run build:client
+      NODE_OPTIONS=--max_old_space_size=4096 npm run build:client
     environment_slug: static
     output_dir: packages/client/build
     routes:

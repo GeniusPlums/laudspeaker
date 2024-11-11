@@ -1,8 +1,9 @@
-
+runtime: nodejs18
 env: flex
-runtime: nodejs
+
 env_variables:
   NODE_ENV: "production"
+  TYPESCRIPT_SUPPORT: "true"
 
 manual_scaling:
   instances: 1
@@ -16,3 +17,5 @@ build:
   dependencies:
     - name: "nodejs"
       version: "18"
+    - name: "typescript"
+      version: "latest"

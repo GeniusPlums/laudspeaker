@@ -1,36 +1,41 @@
 name: laudspeaker
 services:
-  - name: web
+  - name: api
     github:
       branch: staging
       deploy_on_push: true
       repo: your-repo/laudspeaker
     build_command: |
-      npm install
-      npm run build:server
-      npm run build:client
+      npm ci
+      npm run build
     run_command: npm run start:prod
-    environment_slug: nodejs
-    env_vars:
+    environment_slug: nodejs-18
+    envs:
       - key: NODE_ENV
         value: production
     http_port: 80
     instance_count: 1
     instance_size_slug: basic-xxs
     routes:
+      - path: /api
+    source_dir: packages/server
+    build_filter:
+      paths:
+        - packages/server/**
+        - package.json
+        - package-lock.json
+
+  - name: client
+    build_command: |
+      npm ci
+      npm run build:client
+    environment_slug: static
+    output_dir: packages/client/build
+    routes:
       - path: /
-    source_dir: /
-    static_sites:
-      - name: client
-        environment_slug: nodejs
-        build_command: npm run build:client
-        output_dir: packages/client/build
-        routes:
-          - path: /
-    jobs:
-      - name: migrations
-        run_command: npm run migrations
-        github:
-          branch: staging
-          deploy_on_push: true
-          repo: your-repo/laudspeaker
+    source_dir: packages/client
+    build_filter:
+      paths:
+        - packages/client/**
+        - package.json
+        - package-lock.json

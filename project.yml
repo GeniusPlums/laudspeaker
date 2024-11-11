@@ -5,32 +5,34 @@ services:
       branch: staging
       deploy_on_push: true
       repo: your-repo/laudspeaker
-    dockerfile_path: Dockerfile
-    http_port: 80
+    build_command: npm run build:server
+    run_command: npm run start:prod
+    env: node
+    runtime: nodejs:18
     instance_count: 1
     instance_size_slug: basic-xxs
-    routes:
-      - path: /
     healthcheck:
       http_path: /login
       period_seconds: 30
       timeout_seconds: 10
       failure_threshold: 3
+    environment:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_OPTIONS
+        value: --max_old_space_size=4096
 
   - name: client
-    build_command: |
-      npm ci
-      NODE_OPTIONS=--max_old_space_size=4096 npm run build:client
-    environment_slug: static
+    build_command: npm run build:client
+    env: static
+    runtime: nodejs:18
     output_dir: packages/client/build
     routes:
       - path: /
     source_dir: packages/client
-    build_filter:
-      paths:
-        - packages/client/**
-        - package.json
-        - package-lock.json
+    environment:
+      - key: NODE_ENV
+        value: production
 
 databases:
   - name: laudspeaker-db

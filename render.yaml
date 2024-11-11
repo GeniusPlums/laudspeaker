@@ -74,6 +74,10 @@ services:
         value: "--max_old_space_size=4096"
       - key: TYPESCRIPT_SUPPORT
         value: "true"
+      - key: NODE_ENV
+        value: production
+      - key: RUNTIME
+        value: nodejs:18
 
   - type: redis
     name: laudspeaker

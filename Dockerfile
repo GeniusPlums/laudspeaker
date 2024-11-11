@@ -1,6 +1,6 @@
 # To build: docker build -f Dockerfile -t laudspeaker/laudspeaker:latest .
 # To run: docker run -it -p 80:80 --env-file packages/server/.env --rm laudspeaker/laudspeaker:latest
-FROM node:16 as frontend_build
+FROM node:18 as frontend_build
 ARG EXTERNAL_URL
 ARG FRONTEND_SENTRY_AUTH_TOKEN
 ARG FRONTEND_SENTRY_ORG=laudspeaker-rb
@@ -29,7 +29,7 @@ RUN if [ -z "$FRONTEND_SENTRY_AUTH_TOKEN" ] ; then echo "Not building sourcemaps
 # Need to add sentry_release here because of: https://stackoverflow.com/a/41864647
 RUN if [ ! -z "$FRONTEND_SENTRY_AUTH_TOKEN" ] ; then REACT_APP_SENTRY_RELEASE=$(./node_modules/.bin/sentry-cli releases propose-version) npm run build:client:sourcemaps ; fi
 
-FROM node:16 as backend_build
+FROM node:18 as backend_build
 ARG BACKEND_SENTRY_AUTH_TOKEN
 ARG BACKEND_SENTRY_ORG=laudspeaker-rb
 ARG BACKEND_SENTRY_PROJECT=node
@@ -49,7 +49,7 @@ RUN if [ ! -z "$BACKEND_SENTRY_AUTH_TOKEN" ] ; then npm run build:server:sourcem
 
 RUN ./node_modules/.bin/sentry-cli releases propose-version > /app/SENTRY_RELEASE
 
-FROM node:16-alpine As final
+FROM node:18-alpine As final
 # Env vars
 ARG BACKEND_SENTRY_DSN_URL=https://15c7f142467b67973258e7cfaf814500@o4506038702964736.ingest.sentry.io/4506040630640640
 ENV SENTRY_DSN_URL_BACKEND=${BACKEND_SENTRY_DSN_URL}

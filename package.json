@@ -51,5 +51,9 @@
     "luxon": "^3.2.1",
     "p-map": "^5.5.0",
     "taskforce-connector": "^1.24.3"
+  },
+  "engines": {
+    "node": "18.x",
+    "npm": "8.x"
   }
 }

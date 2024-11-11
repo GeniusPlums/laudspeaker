@@ -1,15 +1,10 @@
 services:
   - type: web
     name: laudspeaker
-    env: node
-    buildCommand: |
-      npm ci
-      npm run build
-    startCommand: node dist/main.js
-    nodeVersion: 18
-    healthCheckPath: /login
-    dockerfilePath: ./Dockerfile.laudspeaker
+    env: docker
+    dockerfilePath: ./Dockerfile
     dockerContext: .
+    healthCheckPath: /login
     autoDeploy: false
     disk:
       name: data
@@ -80,58 +75,11 @@ services:
       - key: TYPESCRIPT_SUPPORT
         value: "true"
 
-  - type: web
-    name: laudspeaker-api
-    env: node
-    region: oregon
-    buildCommand: |
-      npm ci
-      npm run build:server
-    startCommand: node dist/main.js
-    nodeVersion: 18.x
-    envVars:
-      - fromGroup: laudspeaker
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 80
-      # ...existing code for other env vars...
-
-  - type: web
-    name: laudspeaker-client
-    env: static
-    buildCommand: |
-      npm ci
-      NODE_ENV=production npm run build:client
-    staticPublishPath: ./dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-
   - type: redis
     name: laudspeaker
     ipAllowList:
       - source: 0.0.0.0/0
         description: everywhere
-
-  - type: pserv
-    name: clickhouse
-    env: docker
-    dockerfilePath: ./Dockerfile.clickhouse
-    disk:
-      name: data
-      mountPath: /var/lib/clickhouse
-      sizeGB: 10
-
-  - type: pserv
-    name: mongo
-    env: docker
-    dockerfilePath: ./Dockerfile.mongo
-    disk:
-      name: data
-      mountPath: /data/db
-      sizeGB: 10
 
 databases:
   - name: laudspeaker-db
